@@ -1,0 +1,90 @@
+<!doctype html>
+<html
+  lang="zh-CN"
+  xmlns:th="https://www.thymeleaf.org"
+  th:fragment="html (head,content)"
+>
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=2"
+    />
+    <title th:text="${post?.spec?.title ? (post.spec.title + ' - ' + site.title) : site.title}"></title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" th:content="${post?.spec?.excerpt ?: site.description}" />
+    <meta name="keywords" th:content="${post?.spec?.tags?.![spec.displayName]}?.join(',')" />
+    
+    <!-- Open Graph -->
+    <meta property="og:type" th:content="${post != null ? 'article' : 'website'}" />
+    <meta property="og:site_name" th:content="${site.title}" />
+    <meta property="og:title" th:content="${post?.spec?.title ?: site.title}" />
+    <meta property="og:description" th:content="${post?.spec?.excerpt ?: site.description}" />
+    <meta property="og:url" th:content="${post?.status?.permalink ?: site.url}" />
+    <meta property="og:image" th:content="${post?.spec?.cover ?: site.logo}" />
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" th:href="${post?.status?.permalink ?: site.url}" />
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    
+    <!-- Stylesheet -->
+    <link
+      rel="stylesheet"
+      th:href="@{/assets/css/style.css?v={version}(version=${theme.spec.version})}"
+    />
+    
+    <!-- Additional Head Content -->
+    <th:block th:if="${head != null}">
+      <th:block th:replace="${head}" />
+    </th:block>
+  </head>
+  <body>
+    <!-- Header -->
+    <header id="app-header"></header>
+
+    <!-- Main Content -->
+    <main>
+      <th:block th:replace="${content}" />
+    </main>
+
+    <!-- Footer -->
+    <footer id="app-footer"></footer>
+
+    <!-- Scripts -->
+    <script
+      th:src="@{/assets/js/layout.js?v={version}(version=${theme.spec.version})}"
+    ></script>
+    <script
+      th:src="@{/assets/js/main.js?v={version}(version=${theme.spec.version})}"
+    ></script>
+    <script
+      th:src="@{/assets/js/modals.js?v={version}(version=${theme.spec.version})}"
+    ></script>
+    
+    <!-- Initialize Layout Scripts -->
+    <script>
+      // Ensure layout scripts run after DOM is ready
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+          if (typeof Layout !== 'undefined') {
+            Layout.init();
+          }
+        });
+      } else {
+        if (typeof Layout !== 'undefined') {
+          Layout.init();
+        }
+      }
+    </script>
+  </body>
+</html>
+

@@ -4,28 +4,16 @@
   th:replace="~{layout :: html(head = null,content = ~{::content})}"
 >
   <th:block th:fragment="content">
-    <!-- Blog Hero -->
     <section class="blog-hero">
         <div class="container">
-            <h1 class="page-title" th:text="${site.title ?: '探索与学习'}">探索与学习</h1>
-            <p class="page-subtitle" th:text="${site.description ?: '最新的语言学习技巧、听力资源推荐和深度文章'}">最新的语言学习技巧、听力资源推荐和深度文章</p>
+            <h1 class="page-title">归档</h1>
+            <p class="page-subtitle">按时间浏览所有文章</p>
         </div>
     </section>
 
-    <!-- Filters -->
-    <section class="filters">
-        <div class="container">
-            <div class="filter-buttons" id="categoryFilters">
-                <a th:href="@{/}" class="filter-btn active">全部文章</a>
-                <!-- 分类过滤器可以通过JavaScript动态加载，或使用Halo的全局变量 -->
-            </div>
-        </div>
-    </section>
-
-    <!-- Blog Content -->
     <section class="blog-content">
         <div class="container">
-            <div class="articles-grid" id="articlesContainer">
+            <div class="articles-grid">
                 <article th:each="post : ${posts.items}" class="article-card">
                     <a th:href="@{${post.status.permalink}}">
                         <div class="article-image" th:if="${post.spec.cover}">
@@ -37,9 +25,6 @@
                         </div>
                         <div class="article-content">
                             <div class="article-meta">
-                                <span th:if="${post.spec.categories != null && !post.spec.categories.isEmpty()}" 
-                                      class="article-category"
-                                      th:text="${post.spec.categories[0].spec.displayName}">分类</span>
                                 <time class="article-date" 
                                       th:if="${post.spec.publishTime}"
                                       th:datetime="${post.spec.publishTime}"
@@ -53,10 +38,6 @@
                         </div>
                     </a>
                 </article>
-                
-                <div th:if="${posts.items == null || posts.items.isEmpty()}" class="no-articles">
-                    <p>暂无文章</p>
-                </div>
             </div>
             
             <!-- Pagination -->
@@ -68,17 +49,6 @@
                 <a th:if="${posts.hasNext()}" 
                    th:href="@{${posts.nextUrl}}" 
                    class="pagination-btn">下一页</a>
-            </div>
-        </div>
-    </section>
-
-    <!-- CTA Section -->
-    <section class="cta">
-        <div class="container">
-            <div class="cta-box">
-                <h2 class="cta-title">想要更多学习资源？</h2>
-                <p class="cta-subtitle">订阅获取最新的语言学习文章、播客推荐和学习技巧</p>
-                <button class="btn btn-primary" id="subscribeBtn2">立即订阅</button>
             </div>
         </div>
     </section>

@@ -1,21 +1,23 @@
 apiVersion: theme.halo.run/v1alpha1
 kind: Theme
 metadata:
-  name: theme-modern-starter
+  # 此字段的值需要和主题文件夹名称一致，否则可能导致部分资源无法正常加载。
+  name: blog-theme--main
 spec:
-  displayName: Modern Starter
+  displayName: TalkMe Blog Theme
   author:
-    name: Halo
-    website: https://github.com/halo-dev
-  description: A development starter theme with Vite Ecosystem for Halo
-  logo: https://www.halo.run/logo
-  homepage: https://github.com/halo-dev/theme-modern-starter#readme
-  repo: https://github.com/halo-dev/theme-modern-starter
-  issues: https://github.com/halo-dev/theme-modern-starter/issues
-  settingName: "theme-modern-starter-setting"
-  configMapName: "theme-modern-starter-configMap"
+    name: TalkMe
+    website: https://talkme.ai
+  description: TalkMe博客主题，基于Halo 2.0，集成现代化的语言学习博客设计
+  logo: https://blog.talkme.ai/wp-content/uploads/2025/05/talkme-logo.png
+  homepage: https://blog.talkme.ai
+  repo: https://github.com/talkme/talkme-blog-theme
+  issues: https://github.com/talkme/talkme-blog-theme/issues
+  settingName: "blog-theme--main-setting"
+  configMapName: "blog-theme--main-configMap"
   version: "1.0.0"
-  requires: "2.0.0"
+  requires: ">=2.0.0"
   license:
     - name: "GPL-3.0"
-      url: "https://github.com/halo-dev/theme-modern-starter/blob/main/LICENSE"
+      url: "https://github.com/talkme/talkme-blog-theme/blob/main/LICENSE"
+

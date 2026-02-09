@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="https://www.thymeleaf.org"
+  th:replace="~{layout :: html(head = null,content = ~{::content})}"
+>
+  <th:block th:fragment="content">
+    <section class="blog-hero">
+        <div class="container">
+            <h1 class="page-title">标签</h1>
+            <p class="page-subtitle">浏览所有文章标签</p>
+        </div>
+    </section>
+
+    <section class="blog-content">
+        <div class="container">
+            <div class="articles-grid">
+                <article th:each="tag : ${tags}" class="article-card">
+                    <a th:href="@{${tag.status.permalink}}">
+                        <div class="article-content">
+                            <h3 class="article-title" th:text="'#' + ${tag.spec.displayName}">标签名称</h3>
+                            <p class="article-excerpt" th:text="${tag.spec.description ?: ''}">标签描述</p>
+                            <div class="article-footer">
+                                <span>查看标签 →</span>
+                            </div>
+                        </div>
+                    </a>
+                </article>
+            </div>
+        </div>
+    </section>
+  </th:block>
+</html>
+

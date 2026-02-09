@@ -1,12 +1,214 @@
 <!DOCTYPE html>
-<html xmlns:th="https://www.thymeleaf.org" th:replace="~{modules/layout :: html(content = ~{::content})}">
+<html
+  xmlns:th="https://www.thymeleaf.org"
+  th:replace="~{layout :: html(head = ~{::head},content = ~{::content})}"
+>
+  <th:block th:fragment="head">
+    <!-- SEO Meta Tags -->
+    <meta name="description" th:content="${post.spec.excerpt ?: site.description}" />
+    <meta name="keywords" th:content="${#strings.listJoin(post.spec.tags.*.spec.displayName, ', ')}" />
+    
+    <!-- Open Graph -->
+    <meta property="og:type" content="article" />
+    <meta property="og:title" th:content="${post.spec.title}" />
+    <meta property="og:description" th:content="${post.spec.excerpt ?: site.description}" />
+    <meta property="og:url" th:content="${post.status.permalink}" />
+    <meta property="og:image" th:content="${post.spec.cover ?: site.logo}" />
+    
+    <!-- Article specific -->
+    <meta property="article:published_time" th:content="${post.spec.publishTime}" />
+    <meta property="article:modified_time" th:content="${post.spec.publishTime}" />
+    <meta th:each="tag : ${post.spec.tags}" 
+          property="article:tag" 
+          th:content="${tag.spec.displayName}" />
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" th:href="${post.status.permalink}" />
+    
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json" th:inline="javascript">
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": /*[[${post.spec.title}]]*/ "",
+      "description": /*[[${post.spec.excerpt ?: site.description}]]*/ "",
+      "image": /*[[${post.spec.cover ?: site.logo}]]*/ "",
+      "author": {
+        "@type": "Person",
+        "name": /*[[${post.spec.owner}]]*/ ""
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": /*[[${site.title}]]*/ "",
+        "logo": {
+          "@type": "ImageObject",
+          "url": /*[[${site.logo}]]*/ ""
+        }
+      },
+      "datePublished": /*[[${post.spec.publishTime}]]*/ "",
+      "dateModified": /*[[${post.spec.publishTime}]]*/ "",
+      "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": /*[[${post.status.permalink}]]*/ ""
+      }
+    }
+    </script>
+  </th:block>
+  
   <th:block th:fragment="content">
-    <article
-      class="prose !max-w-none p-4"
-      th:classappend="${theme.config.post.content_size} + ' ' + ${theme.config.post.content_theme}"
-    >
-      <h1 th:text="${post.spec.title}"></h1>
-      <th:block th:utext="${post.content.content}"> </th:block>
-    </article>
+    <!-- 阅读进度条 -->
+    <div class="reading-progress">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <!-- 面包屑导航 -->
+    <nav aria-label="面包屑导航" class="breadcrumb-nav">
+        <div class="container">
+            <ol class="breadcrumb">
+                <li>
+                    <a th:href="@{/}">首页</a>
+                </li>
+                <li th:if="${post.spec.categories != null && !post.spec.categories.isEmpty()}">
+                    <a th:href="@{/categories/{slug}(slug=${post.spec.categories[0].spec.slug})}" 
+                       th:text="${post.spec.categories[0].spec.displayName}">分类</a>
+                </li>
+                <li>
+                    <span th:text="${post.spec.title}">文章标题</span>
+                </li>
+            </ol>
+        </div>
+    </nav>
+
+    <!-- Article Hero -->
+    <section class="article-hero">
+        <div class="container">
+            <div class="article-meta" th:if="${post.spec.categories != null && !post.spec.categories.isEmpty()}">
+                <span class="article-category" th:text="${post.spec.categories[0].spec.displayName}">分类</span>
+            </div>
+            <h1 class="article-hero-title" th:text="${post.spec.title}">文章标题</h1>
+            <div class="article-meta-info">
+                <span th:if="${post.spec.owner}">
+                    作者: <span th:text="${post.spec.owner}">作者</span>
+                </span>
+                <span th:if="${post.spec.publishTime}">•</span>
+                <time th:if="${post.spec.publishTime}" 
+                      th:datetime="${post.spec.publishTime}"
+                      th:text="${#temporals.format(post.spec.publishTime, 'yyyy年MM月dd日')}">日期</time>
+            </div>
+        </div>
+    </section>
+
+    <!-- Article Content -->
+    <div class="article-container">
+        <div class="container">
+            <div class="article-layout">
+                <!-- 文章主体 -->
+                <article class="article-body">
+                    <!-- 文章封面图 -->
+                    <figure class="article-featured-image" th:if="${post.spec.cover}">
+                        <img th:src="${post.spec.cover}" 
+                             th:alt="${post.spec.title}"
+                             loading="eager">
+                    </figure>
+
+                    <!-- 文章内容 -->
+                    <div th:utext="${post.content.content}">文章内容</div>
+
+                    <!-- 文章标签 -->
+                    <footer class="article-footer" th:if="${post.spec.tags != null && !post.spec.tags.isEmpty()}">
+                        <div class="article-tags">
+                            <strong>标签：</strong>
+                            <a th:each="tag : ${post.spec.tags}"
+                               th:href="@{/tags/{slug}(slug=${tag.spec.slug})}"
+                               th:text="'#' + ${tag.spec.displayName}"
+                               rel="tag">标签</a>
+                        </div>
+                    </footer>
+                </article>
+
+                <!-- 侧边栏：目录导航 -->
+                <aside class="article-sidebar">
+                    <div class="sidebar-sticky">
+                        <nav class="article-toc" aria-label="文章目录">
+                            <h3>文章目录</h3>
+                            <!-- TOC will be generated by JavaScript from article headings -->
+                        </nav>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </div>
+
+    <!-- CTA Section -->
+    <section class="cta">
+        <div class="container">
+            <div class="cta-box">
+                <h2 class="cta-title">想要更多学习资源？</h2>
+                <p class="cta-subtitle">订阅获取最新的语言学习文章、播客推荐和学习技巧</p>
+                <button class="btn btn-primary" id="subscribeBtn2">立即订阅</button>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // 阅读进度条
+        window.addEventListener('scroll', function() {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            const progressBar = document.getElementById('progressBar');
+            if (progressBar) {
+                progressBar.style.width = scrolled + '%';
+            }
+        });
+
+        // 生成目录
+        document.addEventListener('DOMContentLoaded', function() {
+            const toc = document.querySelector('.article-toc');
+            if (!toc) return;
+            
+            const headings = document.querySelectorAll('.article-body h2, .article-body h3');
+            if (headings.length === 0) {
+                toc.style.display = 'none';
+                return;
+            }
+            
+            const tocList = document.createElement('ul');
+            headings.forEach((heading, index) => {
+                const id = 'heading-' + index;
+                heading.id = id;
+                
+                const li = document.createElement('li');
+                const a = document.createElement('a');
+                a.href = '#' + id;
+                a.textContent = heading.textContent;
+                a.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    heading.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                });
+                li.appendChild(a);
+                
+                if (heading.tagName === 'H2') {
+                    tocList.appendChild(li);
+                } else {
+                    // H3 作为 H2 的子项
+                    const lastH2 = tocList.querySelector('li:last-child');
+                    if (lastH2) {
+                        let ul = lastH2.querySelector('ul');
+                        if (!ul) {
+                            ul = document.createElement('ul');
+                            lastH2.appendChild(ul);
+                        }
+                        ul.appendChild(li);
+                    } else {
+                        tocList.appendChild(li);
+                    }
+                }
+            });
+            
+            toc.appendChild(tocList);
+        });
+    </script>
   </th:block>
 </html>
+
